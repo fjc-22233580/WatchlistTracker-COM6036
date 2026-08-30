@@ -1,0 +1,106 @@
+﻿@page
+@using src.Models.Enums
+@model src.Pages.Watchlist.IndexModel
+
+@{
+	ViewData["Title"] = "My Watchlist";
+}
+
+<h1>My Watchlist</h1>
+
+
+
+@if (TempData["SuccessMessage"] is string message)
+{
+	<div class="alert alert-success" role="alert">
+		@message
+	</div>
+}
+
+
+<form method="get" class="mb-3">
+	<div class="row g-2">
+
+		<div class="col-md-6">
+			<input asp-for="SearchTerm"
+			       class="form-control"
+			       placeholder="Search movies..." />
+		</div>
+
+		<div class="col-md-3">
+			<select asp-for="StatusFilter"
+			        asp-items="Html.GetEnumSelectList<WatchStatus>()"
+			        class="form-select">
+
+				<option value="">All statuses</option>
+			</select>
+		</div>
+
+		<div class="col-md-3">
+			<div class="d-flex gap-2">
+				<button type="submit"
+				        class="btn btn-outline-secondary">
+					Filter
+				</button>
+
+				<a asp-page="/Watchlist/Index"
+				   class="btn btn-outline-secondary">
+					Clear
+				</a>
+			</div>
+		</div>
+
+	</div>
+</form>
+
+<p>
+	<a asp-page="/Watchlist/Create" class="btn btn-primary">
+		Add Movie
+	</a>
+</p>
+
+@if (Model.WatchlistItems.Count == 0)
+{
+	<p>Your watchlist is empty.</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Status</th>
+				<th>Rating</th>
+				<th>Edit</th>
+				<th>Delete</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model.WatchlistItems)
+			{
+				<tr>
+					<td>@item.Title</td>
+					<td>@item.Status</td>
+					<td>@(item.Rating?.ToString() ?? "-")</td>
+
+					<td>
+						<a asp-page="/Watchlist/Edit"
+						   asp-route-id="@item.Id"
+						   class="btn btn-sm btn-outline-primary">
+							Edit
+						</a>
+
+					</td>
+
+					<td>
+						<a asp-page="/Watchlist/Delete"
+						   asp-route-id="@item.Id"
+						   class="btn btn-sm btn-outline-danger">
+							Delete
+						</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

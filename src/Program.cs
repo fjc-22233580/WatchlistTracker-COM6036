@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using src.Data;
+using src.Services;
 
 namespace src
 {
@@ -30,6 +31,9 @@ namespace src
 
             // Add Razor Pages services.
             builder.Services.AddRazorPages();
+
+            // Add requires services.
+            builder.Services.AddScoped<WatchlistService>();
 
             // Build the application.
             var app = builder.Build();
