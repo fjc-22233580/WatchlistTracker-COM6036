@@ -48,6 +48,21 @@ public class WatchlistService
 
         return await query.ToListAsync();
     }
+
+    public async Task<(int Total, int Watching, int Watched, int Planned)> GetDashboardCountsAsync(string userId)
+    {
+        var items = await _context.WatchlistItems
+            .Where(item => item.UserId == userId)
+            .ToListAsync();
+
+        return (
+            items.Count,
+            items.Count(item => item.Status == WatchStatus.Watching),
+            items.Count(item => item.Status == WatchStatus.Watched),
+            items.Count(item => item.Status == WatchStatus.Planned)
+        );
+    }
+
     public async Task AddAsync(WatchlistItem item)
     {
         _context.WatchlistItems.Add(item);

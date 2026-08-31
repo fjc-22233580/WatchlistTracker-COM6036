@@ -24,6 +24,7 @@ namespace src.Pages.Watchlist
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
+
         [BindProperty(SupportsGet = true)]
         public WatchStatus? StatusFilter { get; set; }
 
