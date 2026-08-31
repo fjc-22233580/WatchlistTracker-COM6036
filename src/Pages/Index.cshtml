@@ -4,7 +4,66 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (User.Identity?.IsAuthenticated == true)
+{
+	<h2 class="mb-4">Welcome back, @User.Identity?.Name!</h2>
+
+	
+
+	<div class="row g-3 mb-4">
+
+		<div class="col-md-3">
+			<div class="card h-100">
+				<div class="card-body">
+					<h5 class="card-title">Total Movies</h5>
+					<p class="display-6 mb-0">@Model.TotalMovies</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="card h-100">
+				<div class="card-body">
+					<h5 class="card-title">Watching</h5>
+					<p class="display-6 mb-0">@Model.WatchingMovies</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="card h-100">
+				<div class="card-body">
+					<h5 class="card-title">Watched</h5>
+					<p class="display-6 mb-0">@Model.WatchedMovies</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-md-3">
+			<div class="card h-100">
+				<div class="card-body">
+					<h5 class="card-title">Planned</h5>
+					<p class="display-6 mb-0">@Model.PlannedMovies</p>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="d-flex gap-2">
+		<a asp-page="/Watchlist/Index"
+		   class="btn btn-primary">
+			My Watchlist
+		</a>
+
+		<a asp-page="/Watchlist/Create"
+		   class="btn btn-outline-primary">
+			Add Movie
+		</a>
+	</div>
+}
+else
+{
+	<h2 class="mb-4">Watchlist Tracker</h2>
+	<p>Create and manage your personal movie watchlist.</p>
+}
