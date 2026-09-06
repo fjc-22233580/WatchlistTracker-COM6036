@@ -34,3 +34,7 @@ body {
     font-weight: 600;
     border-bottom: 2px solid currentColor;
 }
+
+.auto-dismiss-alert {
+    transition: opacity 0.5s ease;
+}

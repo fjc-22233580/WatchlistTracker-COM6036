@@ -12,7 +12,8 @@
 
 @if (TempData["SuccessMessage"] is string message)
 {
-	<div class="alert alert-success" role="alert">
+	<div class="alert alert-success fade show auto-dismiss-alert"
+	     role="alert">
 		@message
 	</div>
 }
