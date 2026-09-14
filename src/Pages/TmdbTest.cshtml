@@ -1,0 +1,20 @@
+﻿@page
+@model src.Pages.TmdbTestModel
+
+<h1>TMDB Test</h1>
+
+@if (Model.Results.Count == 0)
+{
+	<p>No results returned.</p>
+}
+else
+{
+	<ul>
+		@foreach (var movie in Model.Results)
+		{
+			<li>
+				@movie.Id - @movie.Title - @movie.ReleaseDate
+			</li>
+		}
+	</ul>
+}

@@ -22,6 +22,9 @@ namespace src.Pages.Watchlist
         [BindProperty]
         public WatchlistItemInput Input { get; set; } = new();
 
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -77,7 +80,7 @@ namespace src.Pages.Watchlist
 
             TempData["SuccessMessage"] = "Movie updated successfully.";
 
-            return RedirectToPage("/Watchlist/Index");
+            return LocalRedirect(ReturnUrl ?? "/Watchlist/Index");
         }
 
     }

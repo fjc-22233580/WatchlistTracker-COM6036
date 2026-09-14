@@ -74,4 +74,19 @@ public class WatchlistService
         _context.WatchlistItems.Remove(item);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<WatchlistItem>> GetCurrentlyWatchingAsync(string userId, int count = 3)
+    {
+        return await _context.WatchlistItems
+            .Where(item => item.UserId == userId && item.Status == WatchStatus.Watching)
+            .Take(count)
+            .ToListAsync();
+    }
+
+
+    public async Task<bool> ExistsAsync(string userId, int tmdbId)
+    {
+        return await _context.WatchlistItems
+            .AnyAsync(item => item.UserId == userId && item.TmdbId == tmdbId);
+    }
 }

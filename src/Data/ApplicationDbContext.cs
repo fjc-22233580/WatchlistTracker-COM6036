@@ -8,5 +8,18 @@ namespace src.Data
     {
 
         public DbSet<WatchlistItem> WatchlistItems { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<WatchlistItem>()
+                .HasIndex(item => new
+                {
+                    item.UserId,
+                    item.TmdbId
+                })
+                .IsUnique();
+        }
     }
 }

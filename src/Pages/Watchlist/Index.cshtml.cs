@@ -10,13 +10,16 @@ namespace src.Pages.Watchlist
     public class IndexModel : PageModel
     {
         private readonly WatchlistService _watchlistService;
+        private readonly TmdbService _tmdbService;
         private readonly UserManager<IdentityUser> _userManager;
 
         public IndexModel(
             WatchlistService watchlistService,
+            TmdbService tmdbService,
             UserManager<IdentityUser> userManager)
         {
             _watchlistService = watchlistService;
+            _tmdbService = tmdbService;
             _userManager = userManager;
         }
 
@@ -29,6 +32,13 @@ namespace src.Pages.Watchlist
         public WatchStatus? StatusFilter { get; set; }
 
         public List<WatchlistItem> WatchlistItems { get; set; } = new();
+
+        
+
+        public string? GetPosterUrl(string? posterPath)
+        {
+            return _tmdbService.GetPosterUrl(posterPath);
+        }
 
         public async Task<IActionResult> OnGetAsync()
         {

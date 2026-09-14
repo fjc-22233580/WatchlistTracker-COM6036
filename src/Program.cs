@@ -35,6 +35,8 @@ namespace src
             // Add requires services.
             builder.Services.AddScoped<WatchlistService>();
 
+            builder.Services.AddHttpClient<TmdbService>();
+
             // Build the application.
             var app = builder.Build();
 

@@ -252,5 +252,128 @@ namespace Tests
             Assert.Equal(1, result.Watching);
             Assert.Equal(2, result.Watched);
         }
+
+        [Fact]
+        public async Task GetCurrentlyWatchingAsync_ReturnsOnlyWatchingItemsForSpecifiedUser()
+        {
+            await using var context = CreateContext();
+
+            context.WatchlistItems.AddRange(
+                new WatchlistItem
+                {
+                    Title = "Movie A",
+                    Status = WatchStatus.Watching,
+                    UserId = "user-a"
+                },
+                new WatchlistItem
+                {
+                    Title = "Movie B",
+                    Status = WatchStatus.Planned,
+                    UserId = "user-a"
+                },
+                new WatchlistItem
+                {
+                    Title = "Movie C",
+                    Status = WatchStatus.Watching,
+                    UserId = "user-b"
+                });
+
+            await context.SaveChangesAsync();
+
+            var service = new WatchlistService(context);
+
+            var result = await service.GetCurrentlyWatchingAsync("user-a");
+
+            Assert.Single(result);
+            Assert.Equal("Movie A", result[0].Title);
+            Assert.Equal(WatchStatus.Watching, result[0].Status);
+            Assert.Equal("user-a", result[0].UserId);
+        }
+
+        [Fact]
+        public async Task GetCurrentlyWatchingAsync_RespectsCountLimit()
+        {
+            await using var context = CreateContext();
+
+            context.WatchlistItems.AddRange(
+                new WatchlistItem
+                {
+                    Title = "Movie A",
+                    Status = WatchStatus.Watching,
+                    UserId = "user-a"
+                },
+                new WatchlistItem
+                {
+                    Title = "Movie B",
+                    Status = WatchStatus.Watching,
+                    UserId = "user-a"
+                },
+                new WatchlistItem
+                {
+                    Title = "Movie C",
+                    Status = WatchStatus.Watching,
+                    UserId = "user-a"
+                });
+
+            await context.SaveChangesAsync();
+
+            var service = new WatchlistService(context);
+
+            var result = await service.GetCurrentlyWatchingAsync(
+                "user-a",
+                count: 2);
+
+            Assert.Equal(2, result.Count);
+        }
+
+        [Fact]
+        public async Task ExistsAsync_ReturnsTrue_WhenMovieExistsForUser()
+        {
+            await using var context = CreateContext();
+
+            context.WatchlistItems.Add(
+                new WatchlistItem
+                {
+                    Title = "The Matrix",
+                    Status = WatchStatus.Watched,
+                    UserId = "user-a",
+                    TmdbId = 603
+                });
+
+            await context.SaveChangesAsync();
+
+            var service = new WatchlistService(context);
+
+            var result = await service.ExistsAsync(
+                "user-a",
+                603);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task ExistsAsync_ReturnsFalse_WhenMovieExistsForDifferentUser()
+        {
+            await using var context = CreateContext();
+
+            context.WatchlistItems.Add(
+                new WatchlistItem
+                {
+                    Title = "The Matrix",
+                    Status = WatchStatus.Watched,
+                    UserId = "user-a",
+                    TmdbId = 603
+                });
+
+            await context.SaveChangesAsync();
+
+            var service = new WatchlistService(context);
+
+            var result = await service.ExistsAsync(
+                "user-b",
+                603);
+
+            Assert.False(result);
+        }
     }
 }

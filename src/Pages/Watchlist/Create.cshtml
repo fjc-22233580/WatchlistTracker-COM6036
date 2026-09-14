@@ -8,11 +8,95 @@
 
 <h2 class="mb-4">Add Movie</h2>
 
+<div id="tmdbSection">
+
+	
+
+	<form method="get" class="mb-4">
+		<div class="input-group">
+			<input asp-for="SearchTerm"
+				   class="form-control"
+				   placeholder="Search TMDB for a movie..." />
+
+			<button type="submit" class="btn btn-outline-primary">
+				Search
+			</button>
+		</div>
+	</form>
+
+	@if (Model.SearchResults.Count > 0)
+	{
+		<h3 class="h5 mb-3">Search Results</h3>
+
+		<div class="list-group mb-4">
+			@foreach (var movie in Model.SearchResults)
+			{
+				<div class="list-group-item d-flex justify-content-between align-items-center">
+					<div>
+						<strong>@movie.Title</strong>
+
+						@if (!string.IsNullOrWhiteSpace(movie.ReleaseDate))
+						{
+							<span class="text-muted">
+								(@movie.ReleaseDate)
+							</span>
+						}
+
+						<div class="small text-muted">
+							TMDB ID: @movie.Id
+						</div>
+					</div>
+
+					<a asp-page="/Watchlist/Create"
+					   asp-page-handler="Select"
+					   asp-route-tmdbId="@movie.Id"
+					   asp-route-searchTerm="@Model.SearchTerm"
+					   class="btn btn-sm btn-outline-primary">
+						Select
+					</a>
+				</div>
+			}
+		</div>
+	}
+
+</div>
+
+
+<div class="form-check mb-3">
+	<input asp-for="IsManualEntry"
+	       class="form-check-input"
+	       type="checkbox"
+	       id="manualEntryToggle" />
+
+	<label class="form-check-label"
+	       for="manualEntryToggle">
+		Enter movie manually
+	</label>
+</div>
+
+<div id="selectedMovieSection" class="mb-3">
+	<label class="form-label">Selected Movie</label>
+
+	<div class="form-control bg-light">
+		@(string.IsNullOrWhiteSpace(Model.Input.Title)
+			? "No movie selected"
+			: Model.Input.Title)
+	</div>
+</div>
+
 <form method="post">
 
-	<div class="mb-3">
+	<div asp-validation-summary="ModelOnly"
+		 class="text-danger mb-3">
+	</div>
+
+	<div id="manualTitleSection" class="mb-3">
 		<label asp-for="Input.Title" class="form-label"></label>
-		<input asp-for="Input.Title" class="form-control" />
+
+		<input asp-for="Input.Title"
+		       id="Input_Title"
+		       class="form-control" />
+
 		<span asp-validation-for="Input.Title"
 		      class="text-danger"></span>
 	</div>
@@ -20,18 +104,20 @@
 	<div class="mb-3">
 		<label asp-for="Input.Status" class="form-label"></label>
 		<select asp-for="Input.Status"
-		        asp-items="Html.GetEnumSelectList<WatchStatus>()"
-		        class="form-select">
+				asp-items="Html.GetEnumSelectList<WatchStatus>()"
+				class="form-select">
 		</select>
 	</div>
 
 	<div class="mb-3">
 		<label asp-for="Input.Rating" class="form-label"></label>
 		<input asp-for="Input.Rating"
-		       class="form-control" />
+			   class="form-control" />
 		<span asp-validation-for="Input.Rating"
-		      class="text-danger"></span>
+			  class="text-danger"></span>
 	</div>
+
+	<input asp-for="SelectedTmdbId" type="hidden" />
 
 	<button type="submit" class="btn btn-primary">
 		Add to Watchlist
@@ -41,11 +127,13 @@
 
 @if (TempData["SuccessMessage"] is string message)
 {
-	<div class="alert alert-success" role="alert">
+	<div class="alert alert-success fade show auto-dismiss-alert mt-3"
+		 role="alert">
 		@message
 	</div>
 }
 
 @section Scripts {
 	<partial name="_ValidationScriptsPartial" />
+	<script src="~/js/create-watchlist.js"></script>
 }
