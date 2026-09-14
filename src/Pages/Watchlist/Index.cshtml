@@ -61,46 +61,77 @@
 
 @if (Model.WatchlistItems.Count == 0)
 {
-	<p>Your watchlist is empty.</p>
+    <p>Your watchlist is empty.</p>
 }
 else
 {
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Title</th>
-				<th>Status</th>
-				<th>Rating</th>
-				<th>Edit</th>
-				<th>Delete</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var item in Model.WatchlistItems)
-			{
-				<tr>
-					<td>@item.Title</td>
-					<td>@item.Status</td>
-					<td>@(item.Rating?.ToString() ?? "-")</td>
+	<div class="row g-4">
+		@foreach (var item in Model.WatchlistItems)
+		{
+			<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+				<div class="card h-100 shadow-sm">
 
-					<td>
-						<a asp-page="/Watchlist/Edit"
-						   asp-route-id="@item.Id"
-						   class="btn btn-sm btn-outline-primary">
-							Edit
-						</a>
+					@if (!string.IsNullOrWhiteSpace(item.PosterPath))
+					{
+						<img src="@Model.GetPosterUrl(item.PosterPath)"
+						     class="card-img-top"
+						     alt="@item.Title poster"
+						     style="width: 100%; height: auto;" />
+					}
 
-					</td>
+					<div class="card-body d-flex flex-column">
 
-					<td>
-						<a asp-page="/Watchlist/Delete"
-						   asp-route-id="@item.Id"
-						   class="btn btn-sm btn-outline-danger">
-							Delete
-						</a>
-					</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+						<h5 class="card-title">
+							@item.Title
+						</h5>
+
+						<div class="mb-2">
+							<span class="badge bg-secondary">
+								@item.Status
+							</span>
+						</div>
+
+						@if (!string.IsNullOrWhiteSpace(item.Overview))
+						{
+							<p class="card-text">
+								@item.Overview
+							</p>
+						}
+
+						<div class="mt-auto">
+
+							<div class="mb-3">
+								<strong>Your rating:</strong>
+								@(item.Rating?.ToString() ?? "-") / 10
+							</div>
+
+							@if (item.VoteAverage.HasValue)
+							{
+								<div class="mb-3">
+									<strong>TMDB rating:</strong>
+									@item.VoteAverage.Value.ToString("0.0") / 10
+								</div>
+							}
+
+							<div class="d-flex gap-2">
+								<a asp-page="/Watchlist/Edit"
+								   asp-route-id="@item.Id"
+								   class="btn btn-sm btn-outline-primary">
+									Edit
+								</a>
+
+								<a asp-page="/Watchlist/Delete"
+								   asp-route-id="@item.Id"
+								   class="btn btn-sm btn-outline-danger">
+									Delete
+								</a>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+		}
+	</div>
 }

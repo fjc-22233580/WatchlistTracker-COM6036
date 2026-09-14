@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using src.Models;
 using src.Services;
 
 namespace src.Pages
@@ -9,13 +9,16 @@ namespace src.Pages
     {
 
         private readonly WatchlistService _watchlistService;
+        private readonly TmdbService _tmdbService;
         private readonly UserManager<IdentityUser> _userManager;
 
         public IndexModel(
             WatchlistService watchlistService,
+            TmdbService tmdbService,
             UserManager<IdentityUser> userManager)
         {
             _watchlistService = watchlistService;
+            _tmdbService = tmdbService;
             _userManager = userManager;
         }
 
@@ -26,6 +29,14 @@ namespace src.Pages
         public int WatchedMovies { get; set; }
 
         public int PlannedMovies { get; set; }
+
+        public List<WatchlistItem> CurrentlyWatching { get; set; } = new();
+
+
+        public string? GetPosterUrl(string? posterPath)
+        {
+            return _tmdbService.GetPosterUrl(posterPath);
+        }
 
         public async Task OnGetAsync()
         {
@@ -47,6 +58,9 @@ namespace src.Pages
             WatchingMovies = counts.Watching;
             WatchedMovies = counts.Watched;
             PlannedMovies = counts.Planned;
+
+            CurrentlyWatching = await _watchlistService.GetCurrentlyWatchingAsync(userId);
+
         }
     }
 }

@@ -34,7 +34,8 @@
 		Save Changes
 	</button>
 
-	<a asp-page="/Watchlist/Index" class="btn btn-secondary">
+	<a href="@(Model.ReturnUrl ?? "/Watchlist/Index")"
+	   class="btn btn-secondary">
 		Cancel
 	</a>
 
