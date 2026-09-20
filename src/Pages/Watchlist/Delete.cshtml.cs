@@ -42,26 +42,35 @@ namespace src.Pages.Watchlist
             return Page();
         }
 
+        /// <summary>
+        /// Handles submission of the delete form.
+        /// Validates the authenticated user and verifies that the requested movie
+        /// belongs to that user before deleting it.
+        /// </summary>
+        /// <param name="id">The identifier of the movie to delete.</param>
         public async Task<IActionResult> OnPostAsync(int id)
         {
+            // Get the identifier of the currently authenticated user.
             var userId = _userManager.GetUserId(User);
-
             if (userId == null)
             {
                 return Challenge();
             }
 
+            // Retrieve the requested movie and verify that it belongs to the current user.
             var item = await _watchlistService.GetByIdAsync(id, userId);
-
             if (item == null)
             {
                 return NotFound();
             }
 
+            // Delete the movie from the user's watchlist.
             await _watchlistService.DeleteAsync(item);
 
+            // Notify the user that the movie was successfully removed.
             TempData["SuccessMessage"] = "Movie removed from your watchlist.";
 
+            // Return the user to the watchlist index page.
             return RedirectToPage("/Watchlist/Index");
         }
     }

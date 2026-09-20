@@ -69,9 +69,16 @@ public class WatchlistService
         await _context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Deletes the specified watchlist item from persistent storage.
+    /// </summary>
+    /// <param name="item">The watchlist item to delete.</param>
     public async Task DeleteAsync(WatchlistItem item)
     {
+        // Remove the item from the tracked watchlist collection.
         _context.WatchlistItems.Remove(item);
+
+        // Persist the deletion to the database.
         await _context.SaveChangesAsync();
     }
 
