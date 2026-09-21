@@ -18,6 +18,27 @@ public class TmdbService
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
     }
 
+    public async Task<bool> IsAliveAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+
+            var url = "https://api.themoviedb.org/3/configuration";
+            var response = await _httpClient.GetAsync(url, cts.Token);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (HttpRequestException)
+        {
+            return false;
+        }
+        catch (TaskCanceledException)
+        {
+            return false;
+        }
+    }
+
     public async Task<TmdbMovieResult?> GetMovieAsync(int tmdbId)
     {
         try

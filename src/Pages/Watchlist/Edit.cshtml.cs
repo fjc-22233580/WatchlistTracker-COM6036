@@ -19,6 +19,8 @@ namespace src.Pages.Watchlist
             _userManager = userManager;
         }
 
+        public bool IsTmdbMovie { get; set; }
+
         [BindProperty]
         public WatchlistItemInput Input { get; set; } = new();
 
@@ -40,6 +42,8 @@ namespace src.Pages.Watchlist
             {
                 return NotFound();
             }
+
+            IsTmdbMovie = item.TmdbId.HasValue;
 
             Input = new WatchlistItemInput
             {
@@ -72,7 +76,12 @@ namespace src.Pages.Watchlist
                 return NotFound();
             }
 
-            item.Title = Input.Title;
+            // Only manually entered movies can have their title changed.
+            if (!item.TmdbId.HasValue)
+            {
+                item.Title = Input.Title;
+            }
+
             item.Status = Input.Status;
             item.Rating = Input.Rating;
 

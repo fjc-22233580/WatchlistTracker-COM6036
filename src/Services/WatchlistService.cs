@@ -14,6 +14,22 @@ public class WatchlistService
         _context = context;
     }
 
+    public async Task<bool> IsAliveAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(
+                TimeSpan.FromSeconds(3));
+
+            return await _context.Database
+                .CanConnectAsync(cts.Token);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public async Task<WatchlistItem?> GetByIdAsync(int id, string userId)
     {
         return await _context.WatchlistItems

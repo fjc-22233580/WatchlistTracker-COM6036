@@ -22,6 +22,10 @@ namespace src.Pages
             _userManager = userManager;
         }
 
+        public bool SupabaseAvailable { get; set; }
+
+        public bool TmdbAvailable { get; set; }
+
         public int TotalMovies { get; set; }
 
         public int WatchingMovies { get; set; }
@@ -40,6 +44,14 @@ namespace src.Pages
 
         public async Task OnGetAsync()
         {
+            var supabaseCheck = _watchlistService.IsAliveAsync();
+            var tmdbCheck = _tmdbService.IsAliveAsync();
+
+            await Task.WhenAll(supabaseCheck, tmdbCheck);
+
+            SupabaseAvailable = await supabaseCheck;
+            TmdbAvailable = await tmdbCheck;
+
             if (User.Identity?.IsAuthenticated == false)
             {
                 return;
