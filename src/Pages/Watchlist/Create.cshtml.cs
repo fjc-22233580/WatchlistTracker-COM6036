@@ -9,6 +9,11 @@ using src.Services;
 
 namespace src.Pages.Watchlist
 {
+    /// <summary>
+    /// Page model for creating watchlist items. This model handles TMDB searches,
+    /// selection of TMDB results, and creating a watchlist item for the current user.
+    /// Requires an authenticated user.
+    /// </summary>
     [Authorize]
     public class CreateModel : PageModel
     {
@@ -16,6 +21,12 @@ namespace src.Pages.Watchlist
         private readonly UserManager<IdentityUser> _userManager;
         private readonly TmdbService _tmdbService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateModel"/> class.
+        /// </summary>
+        /// <param name="watchlistService">Service used to manage watchlist persistence.</param>
+        /// <param name="userManager">ASP.NET Core Identity user manager.</param>
+        /// <param name="tmdbService">Service used to query TMDB for movie data.</param>
         public CreateModel(
             WatchlistService watchlistService,
             UserManager<IdentityUser> userManager,
@@ -26,20 +37,40 @@ namespace src.Pages.Watchlist
             _tmdbService = tmdbService;
         }
 
+        /// <summary>
+        /// Input model bound for create form POSTs. Validated by data annotations.
+        /// </summary>
         [BindProperty]
         public WatchlistItemInput Input { get; set; } = new();
 
+        /// <summary>
+        /// Optional search term bound on GET to perform TMDB searches.
+        /// Supports GET binding so the term persists between requests.
+        /// </summary>
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
+        /// <summary>
+        /// Results returned from TMDB when a search is performed. Limited to 10 items for display.
+        /// </summary>
         public List<TmdbMovieResult> SearchResults { get; set; } = new();
 
+        /// <summary>
+        /// If a user selects a TMDB result this property holds the chosen TMDB id.
+        /// </summary>
         [BindProperty]
         public int? SelectedTmdbId { get; set; }
 
+        /// <summary>
+        /// Indicates the user has chosen to enter the movie manually instead of selecting a TMDB result.
+        /// </summary>
         [BindProperty]
         public bool IsManualEntry { get; set; }
 
+        /// <summary>
+        /// Handles GET requests to optionally perform a TMDB search when a SearchTerm is present.
+        /// Populates <see cref="SearchResults"/> with up to 10 results.
+        /// </summary>
         public async Task OnGetAsync()
         {
             if (string.IsNullOrWhiteSpace(SearchTerm))
@@ -54,6 +85,12 @@ namespace src.Pages.Watchlist
                 .ToList() ?? new();
         }
 
+        /// <summary>
+        /// Handles POST requests to create a new watchlist item for the current user.
+        /// Validates the model, prevents duplicates when a TMDB id is selected, and
+        /// populates the persisted item with metadata from TMDB when available.
+        /// </summary>
+        /// <returns>Page when validation fails; redirects back to the create page on success.</returns>
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -114,6 +151,10 @@ namespace src.Pages.Watchlist
             return RedirectToPage("/Watchlist/Create");
         }
 
+        /// <summary>
+        /// Handler used when a user selects a movie from TMDB search results. It reloads
+        /// the search results and pre-fills the input model with the selected movie's title.
+        /// </summary>
         public async Task<IActionResult> OnGetSelectAsync(int tmdbId, string searchTerm)
         {
             var response = await _tmdbService.SearchMoviesAsync(searchTerm);

@@ -140,6 +140,90 @@
 }
 else
 {
-	<h2 class="mb-4">Watchlist Tracker</h2>
-	<p>Create and manage your personal movie watchlist.</p>
+	<div class="py-5">
+		<div class="row align-items-center g-4">
+
+			<div class="col-lg-7">
+				<h1 class="display-5 fw-bold">
+					Watchlist Tracker
+				</h1>
+
+				<p class="lead text-muted">
+					Search for movies, build a personal watchlist,
+					track viewing progress, and record your own ratings.
+				</p>
+
+				<div class="d-flex gap-2 mt-4">
+					<a asp-area="Identity"
+					   asp-page="/Account/Register"
+					   class="btn btn-primary btn-lg">
+						Create Account
+					</a>
+
+					<a asp-area="Identity"
+					   asp-page="/Account/Login"
+					   class="btn btn-outline-secondary btn-lg">
+						Log In
+					</a>
+				</div>
+			</div>
+
+			<div class="col-lg-5">
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<h2 class="h5 mb-3">Features</h2>
+
+						<ul class="mb-0">
+							<li>Search movies using TMDB</li>
+							<li>Build your own private watchlist</li>
+							<li>Track planned, watching and watched movies</li>
+							<li>Add personal ratings</li>
+							<li>View movie posters and metadata</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
 }
+
+<div class="card mt-4">
+	<div class="card-body">
+		<h2 class="h6 mb-3">Service Status</h2>
+
+		<div class="d-flex gap-4">
+			<span>
+				Database:
+				@if (Model.SupabaseAvailable)
+				{
+					<span class="badge bg-success">
+						Available
+					</span>
+				}
+				else
+				{
+					<span class="badge bg-danger">
+						Unavailable
+					</span>
+				}
+			</span>
+
+			<span>
+				TMDB:
+				@if (Model.TmdbAvailable)
+				{
+					<span class="badge bg-success">
+						Available
+					</span>
+				}
+				else
+				{
+					<span class="badge bg-danger">
+						Unavailable
+					</span>
+				}
+			</span>
+		</div>
+	</div>
+</div>

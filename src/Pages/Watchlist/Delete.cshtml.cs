@@ -6,11 +6,21 @@ using src.Services;
 
 namespace src.Pages.Watchlist
 {
+    /// <summary>
+    /// Page model responsible for showing the delete confirmation for a watchlist item
+    /// and handling the delete action. Ensures the authenticated user owns the item
+    /// before allowing deletion.
+    /// </summary>
     public class DeleteModel : PageModel
     {
         private readonly WatchlistService _watchlistService;
         private readonly UserManager<IdentityUser> _userManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeleteModel"/> class.
+        /// </summary>
+        /// <param name="watchlistService">Service used to access and modify the watchlist.</param>
+        /// <param name="userManager">ASP.NET Core Identity user manager.</param>
         public DeleteModel(
             WatchlistService watchlistService,
             UserManager<IdentityUser> userManager)
@@ -19,8 +29,16 @@ namespace src.Pages.Watchlist
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// The watchlist item being considered for deletion. Populated by OnGetAsync.
+        /// </summary>
         public WatchlistItem WatchlistItem { get; set; } = null!;
 
+        /// <summary>
+        /// Handles GET requests to display the delete confirmation for the specified item id.
+        /// Verifies that the currently authenticated user owns the item before showing details.
+        /// </summary>
+        /// <param name="id">Identifier of the watchlist item to display.</param>
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var userId = _userManager.GetUserId(User);
