@@ -2,6 +2,13 @@
 @using src.Models.Enums
 @model src.Pages.Watchlist.CreateModel
 
+@*
+	Watchlist Create page
+	- Provides a TMDB search (GET) to locate movies and select one to pre-fill the creation form.
+	- Supports manual entry via the "Enter movie manually" checkbox.
+	- Binds to CreateModel and posts back to create a WatchlistItem for the current user.
+*@
+
 @{
 	ViewData["Title"] = "Add Movie";
 }
