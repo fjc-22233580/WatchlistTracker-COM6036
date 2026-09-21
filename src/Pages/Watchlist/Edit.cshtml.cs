@@ -88,11 +88,6 @@ namespace src.Pages.Watchlist
         /// <param name="id">The identifier of the watchlist item to update.</param>
         public async Task<IActionResult> OnPostAsync(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
             var userId = _userManager.GetUserId(User);
 
             if (userId == null)
@@ -107,7 +102,13 @@ namespace src.Pages.Watchlist
                 return NotFound();
             }
 
-            // Only manually entered movies can have their title changed.
+            IsTmdbMovie = item.TmdbId.HasValue;
+
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
             if (!item.TmdbId.HasValue)
             {
                 item.Title = Input.Title;
