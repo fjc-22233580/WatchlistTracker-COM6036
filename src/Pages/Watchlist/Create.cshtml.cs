@@ -87,10 +87,11 @@ namespace src.Pages.Watchlist
 
         /// <summary>
         /// Handles POST requests to create a new watchlist item for the current user.
-        /// Validates the model, prevents duplicates when a TMDB id is selected, and
-        /// populates the persisted item with metadata from TMDB when available.
+        /// Supports either manual entry or a TMDB-backed movie selection.
         /// </summary>
-        /// <returns>Page when validation fails; redirects back to the create page on success.</returns>
+        /// <returns>
+        /// Page when validation fails; redirects back to the create page on success.
+        /// </returns>
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -105,8 +106,36 @@ namespace src.Pages.Watchlist
                 return Challenge();
             }
 
-            if (SelectedTmdbId.HasValue)
+            WatchlistItem item;
+
+            // Manual entry
+            if (IsManualEntry)
             {
+                item = new WatchlistItem
+                {
+                    Title = Input.Title,
+                    Status = Input.Status,
+                    Rating = Input.Rating,
+                    UserId = userId,
+
+                    TmdbId = null,
+                    PosterPath = null,
+                    Overview = null,
+                    VoteAverage = null
+                };
+            }
+            // TMDB entry
+            else
+            {
+                if (!SelectedTmdbId.HasValue)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Please select a movie from TMDB.");
+
+                    return Page();
+                }
+
                 var exists = await _watchlistService.ExistsAsync(
                     userId,
                     SelectedTmdbId.Value);
@@ -119,34 +148,37 @@ namespace src.Pages.Watchlist
 
                     return Page();
                 }
+
+                var movie = await _tmdbService.GetMovieAsync(
+                    SelectedTmdbId.Value);
+
+                if (movie == null)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "The selected movie could not be retrieved.");
+
+                    return Page();
+                }
+
+                item = new WatchlistItem
+                {
+                    Title = movie.Title,
+                    Status = Input.Status,
+                    Rating = Input.Rating,
+                    UserId = userId,
+
+                    TmdbId = movie.Id,
+                    PosterPath = movie.PosterPath,
+                    Overview = movie.Overview,
+                    VoteAverage = movie.VoteAverage
+                };
             }
-
-            var movie = await _tmdbService.GetMovieAsync(SelectedTmdbId.Value);
-
-            if (movie == null)
-            {
-                ModelState.AddModelError(string.Empty, "The selected movie could not be retrieved.");
-
-                return Page();
-            }
-
-            var item = new WatchlistItem
-            {
-                Title = Input.Title,
-                Status = Input.Status,
-                Rating = Input.Rating,
-                UserId = userId,
-
-                TmdbId = movie.Id,
-                PosterPath = movie.PosterPath,
-                Overview = movie.Overview,
-                VoteAverage = movie.VoteAverage
-            };
 
             await _watchlistService.AddAsync(item);
 
-            // Set response message for next request
-            TempData["SuccessMessage"] = "Movie added to your watchlist.";
+            TempData["SuccessMessage"] =
+                "Movie added to your watchlist.";
 
             return RedirectToPage("/Watchlist/Create");
         }
